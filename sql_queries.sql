@@ -46,8 +46,17 @@ select * from  ranks_tab where ranks =1
 
 4- write a query to find city which had lowest percentage spend for gold card type
 
-select top 1 city,sum(amount) as spends from credit_card_transcations where card_type = 'gold' group by city order by spends 
-
+with cte as (
+select top 1 city,card_type,sum(amount) as amount
+,sum(case when card_type='Gold' then amount end) as gold_amount
+from credit_card_transcations
+group by city,card_type)
+select 
+city,sum(gold_amount)*1.0/sum(amount) as gold_ratio
+from cte
+group by city
+having count(gold_amount) > 0 and sum(gold_amount)>0
+order by gold_ratio;
 
 5- write a query to print 3 columns:  city, highest_expense_type , lowest_expense_type (example format : Delhi , bills, Fuel)
 
